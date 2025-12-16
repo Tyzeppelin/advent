@@ -60,7 +60,7 @@ def day_two():
     part_1 = 0
     part_2 = 0
     with open("day_two.txt", 'r') as f:
-        for l, u in [r.split("-") for r in f.read().rstrip().split(",")][:5]:
+        for l, u in [r.split("-") for r in f.read().rstrip().split(",")]:
             low = int(l)
             up = int(u)
             l_low = len(l)
@@ -73,25 +73,32 @@ def day_two():
             invalid_set = set()
             print("$", low, up)
             for sz in range(l_low, l_up+1):
-                print("------------------", sz)
+                #print("------------------", sz)
+                l_adj = low  if low >= 10**(sz-1) else 10**(sz-1)
+                l_adj_str = str(l_adj)
+                u_adj = up if up <= 10**sz-1 else 10**sz-1
+                u_adj_str = str(u_adj)
+                # size of 1 <- auto in
                 invalid_set |= {int("1"*sz)}
                 print(sz, [1] + [e for e in range(1, up_bound, 1) if e in _primes and sz % e == 0])
+                #print(l_adj, u_adj)
                 for q in [1] + [e for e in range(1, up_bound, 1) if e in _primes and sz % e == 0]:
                     #print("q:", q, invalid_set)
                     # min
-                    a = 10 ** (q-1) if 2*q != l_low else int(l[:q]) if int(l[:q]) >= int(l[q:]) else int(l[:q]) + 1
+                    a = int(l_adj_str[:q]) if int(l_adj_str[:q] * (sz//q)) >= int(l_adj) else int(l_adj_str[:q]) + 1
                     # max
-                    b = 10 ** (q) - 1 if 2*q != l_up else int(u[:q]) if int(u[:q]) <= int(u[q:]) else int(u[:q]) - 1
-                    #print("=", l, u, a, b)
+                    b = int(u_adj_str[:q]) if int(u_adj_str[:q] * (sz//q)) <= int(u_adj) else int(u_adj_str[:q]) - 1
+                    print("=", l, u, a, b, sz, q)
                     if sz / q == 2.0:
-                        #print("here")
                         s2 = sum_npeat(a, b, 2)
+                        print(low, up, sz, q, l_adj, u_adj, a, b, s2, sorted(set_npeat(a, b)), sum(set_npeat(a, b)))
                         part_1 += s2
-                    invalid_set = invalid_set | set_npeat(_nearest(a, q), _nearest(b, q), q)
+                    invalid_set = invalid_set 
             #print(l, u, sorted(invalid_set))
             else:
                 print("=======================")
 
+    print("Is part1 correct?", part_1 == 32976912643, 32976912643)
 
     return part_1, "NOT YET"
 
